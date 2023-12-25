@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Event(models.Model):
-    tx_hash = models.CharField(max_length=66)
+    tx_hash = models.CharField(max_length=66, unique=True)
     from_address = models.CharField(max_length=42)
     to_address = models.CharField(max_length=42)
     value = models.BigIntegerField()
