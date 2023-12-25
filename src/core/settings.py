@@ -129,19 +129,20 @@ LOGGING = {
 POLYGON_NODE_URL = os.getenv('POLYGON_NODE_URL')
 CONTRACT_ADDRESS = os.getenv('CONTRACT_ADDRESS')
 CONTRACT_ABI = os.getenv('CONTRACT_ABI')
+EVENT_FETCH_INTERVAL = int(os.getenv('EVENT_FETCH_INTERVAL', 30))
 
 # Celery Settings
-CELERY_BROKER_URL = os.getenv('CONTRACT_ABI', 'redis://localhost:6379/0')
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = os.getenv(
+    'CELERY_RESULT_BACKEND', 'redis://localhost:6379/0'
+)
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-CELERY_EVENT_FETCH_INTERVAL = int(os.getenv('CELERY_EVENT_FETCH_INTERVAL', 5))
-
-from celery.schedules import crontab
 
 CELERY_BEAT_SCHEDULE = {
-    'fetch-and-save-events-every-minute': {
-        'task': 'myapp.tasks.fetch_and_save_events',
-        'schedule': crontab(minute='*/1'),  # Adjust timing as needed
+    'fetch-and-save-events': {
+        'task': 'drf_web3.tasks.fetch_and_save_events',
+        'schedule': EVENT_FETCH_INTERVAL,
     },
 }
