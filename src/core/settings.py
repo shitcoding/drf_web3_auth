@@ -125,11 +125,22 @@ LOGGING = {
 }
 
 
+# DRF settings
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': os.getenv('DJANGO_PAGINATION_PAGE_SIZE', 10)
+}
+
+
 # Web3 settings
 POLYGON_NODE_URL = os.getenv('POLYGON_NODE_URL')
 CONTRACT_ADDRESS = os.getenv('CONTRACT_ADDRESS')
 CONTRACT_ABI = os.getenv('CONTRACT_ABI')
 EVENT_FETCH_INTERVAL = int(os.getenv('EVENT_FETCH_INTERVAL', 30))
+
 
 # Celery Settings
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')
