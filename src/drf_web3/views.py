@@ -1,5 +1,4 @@
 from django.contrib.admin.filters import ValidationError
-from django.contrib.auth.models import User
 from rest_framework import generics, status, views, viewsets
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import IsAuthenticated
@@ -9,8 +8,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .authentication import Web3Authentication
 from .models import CustomUser, Event
-from .serializers import (EthAccountNonceSerializer, EventSerializer,
-                          Web3AuthSerializer)
+from .serializers import EventSerializer, EthAccountMessageSerializer, Web3AuthSerializer
 
 
 class EventViewSet(viewsets.ReadOnlyModelViewSet):
@@ -21,22 +19,21 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]
 
 
-class EthAccountNonceView(generics.RetrieveAPIView):
-    serializer_class = EthAccountNonceSerializer
+class EthAccountMessageView(generics.RetrieveAPIView):
+    serializer_class = EthAccountMessageSerializer
 
     def get_object(self):
         eth_address = self.kwargs.get('eth_address')
         if not eth_address:
-            # Handle the case where eth_address is not provided
             raise ValidationError('Ethereum address is required.')
 
         account, created = CustomUser.objects.get_or_create(
             username=eth_address, eth_address=eth_address
         )
         if created:
-            # Set an unusable password as this user will use Web3 Auth
             account.set_unusable_password()
             account.save()
+        account.generate_message_to_sign()
         return account
 
 

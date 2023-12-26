@@ -15,10 +15,10 @@ class EventSerializer(serializers.ModelSerializer):
         ]
 
 
-class EthAccountNonceSerializer(serializers.ModelSerializer):
+class EthAccountMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['eth_address', 'nonce']
+        fields = ['eth_address', 'message_to_sign']
 
 
 class Web3AuthSerializer(serializers.Serializer):
