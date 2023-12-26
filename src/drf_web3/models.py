@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 
 
@@ -10,3 +12,11 @@ class Event(models.Model):
 
     def __str__(self):
         return self.tx_hash
+
+
+class EthAccount(models.Model):
+    address = models.CharField(max_length=42, unique=True)
+    nonce = models.UUIDField(default=uuid.uuid4, editable=False)
+
+    def __str__(self):
+        return self.address
