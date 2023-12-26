@@ -8,6 +8,6 @@ router.register('events', EventViewSet, basename='events')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('nonce/<str:address>/', EthAccountNonceView.as_view(), name='nonce'),
+    path('nonce/<str:eth_address>/', EthAccountNonceView.as_view(), name='nonce'),
     path('auth/web3/', Web3AuthView.as_view(), name='web3-auth'),
 ]

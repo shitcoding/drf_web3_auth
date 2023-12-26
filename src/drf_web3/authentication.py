@@ -5,21 +5,21 @@ from eth_account.messages import encode_defunct
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 
-from .models import EthAccount
+from .models import CustomUser
 
 
 class Web3Authentication(BaseAuthentication):
     def authenticate(self, request):
-        address = request.data.get('address')
+        eth_address = request.data.get('eth_address')
         signature = request.data.get('signature')
 
-        if not address or not signature:
+        if not eth_address or not signature:
             return None
 
         try:
-            account = EthAccount.objects.get(address=address)
-        except EthAccount.DoesNotExist:
-            raise AuthenticationFailed('No such user')
+            account = CustomUser.objects.get(eth_address=eth_address)
+        except CustomUser.DoesNotExist:
+            raise AuthenticationFailed('Account does not exist')
 
         message = f'I am signing my one-time nonce: {account.nonce}'
         message_encoded = encode_defunct(text=message)
@@ -27,10 +27,8 @@ class Web3Authentication(BaseAuthentication):
             message_encoded, signature=signature
         )
 
-        if signer_address.lower() == address.lower():
-            account.nonce = (
-                uuid.uuid4()
-            )  # Update nonce after successful authentication
+        if signer_address.lower() == eth_address.lower():
+            account.nonce = uuid.uuid4()
             account.save()
             return (account, None)
 
@@ -44,9 +42,8 @@ class Web3Authentication(BaseAuthentication):
             message_encoded, signature=signature
         )
 
-        if signer_address.lower() != account.address.lower():
+        if signer_address.lower() != account.eth_address.lower():
             raise AuthenticationFailed('Invalid signature')
 
-        # Update nonce after successful authentication
         account.nonce = uuid.uuid4()
         account.save()

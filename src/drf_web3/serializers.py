@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import EthAccount, Event
+from .models import CustomUser, Event
 
 
 class EventSerializer(serializers.ModelSerializer):
@@ -15,12 +15,12 @@ class EventSerializer(serializers.ModelSerializer):
         ]
 
 
-class EthAccountSerializer(serializers.ModelSerializer):
+class EthAccountNonceSerializer(serializers.ModelSerializer):
     class Meta:
-        model = EthAccount
-        fields = ['address', 'nonce']
+        model = CustomUser
+        fields = ['eth_address', 'nonce']
 
 
 class Web3AuthSerializer(serializers.Serializer):
-    address = serializers.CharField(max_length=42)
+    eth_address = serializers.CharField(max_length=42)
     signature = serializers.CharField(max_length=255)

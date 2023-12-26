@@ -1,13 +1,15 @@
+from django.contrib.admin.filters import ValidationError
+from django.contrib.auth.models import User
 from rest_framework import generics, status, views, viewsets
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.exceptions import AuthenticationFailed
 
 from .authentication import Web3Authentication
-from .models import EthAccount, Event
-from .serializers import (EthAccountSerializer, EventSerializer,
+from .models import CustomUser, Event
+from .serializers import (EthAccountNonceSerializer, EventSerializer,
                           Web3AuthSerializer)
 
 
@@ -20,11 +22,21 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class EthAccountNonceView(generics.RetrieveAPIView):
-    serializer_class = EthAccountSerializer
+    serializer_class = EthAccountNonceSerializer
 
     def get_object(self):
-        address = self.kwargs.get('address')
-        account, _ = EthAccount.objects.get_or_create(address=address)
+        eth_address = self.kwargs.get('eth_address')
+        if not eth_address:
+            # Handle the case where eth_address is not provided
+            raise ValidationError('Ethereum address is required.')
+
+        account, created = CustomUser.objects.get_or_create(
+            username=eth_address, eth_address=eth_address
+        )
+        if created:
+            # Set an unusable password as this user will use Web3 Auth
+            account.set_unusable_password()
+            account.save()
         return account
 
 
@@ -34,12 +46,15 @@ class Web3AuthView(views.APIView):
     def post(self, request, *args, **kwargs):
         serializer = Web3AuthSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        address = serializer.validated_data['address']
+        eth_address = serializer.validated_data['eth_address']
         signature = serializer.validated_data['signature']
 
-        account, created = EthAccount.objects.get_or_create(address=address)
+        account, created = CustomUser.objects.get_or_create(
+            username=eth_address, eth_address=eth_address
+        )
         if created:
-            # If the account is newly created, save to generate nonce
+            # Set an unusable password as this user will use Web3 Auth
+            account.set_unusable_password()
             account.save()
 
         try:
@@ -53,8 +68,7 @@ class Web3AuthView(views.APIView):
             )
         except AuthenticationFailed as e:
             if created:
-                # If authentication fails and account was newly created, delete it
-                account.delete()
+                account.delete()  # Delete the account if it was newly created and authentication failed
             return Response(
                 {'error': str(e)}, status=status.HTTP_401_UNAUTHORIZED
             )
