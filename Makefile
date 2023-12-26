@@ -3,6 +3,16 @@ DJANGO_EXEC=docker compose exec django sh -c
 env:
 	cp .env.example .env
 
+up:
+	docker compose up -d --build
+
+down:
+	docker compose down
+
+restart:
+	docker compose down
+	docker compose up -d --build
+
 shell:
 	$(DJANGO_EXEC) "python manage.py shell"
 
@@ -31,6 +41,9 @@ requirements:
 
 .PHONY: \
 	env \
+	up \
+	down \
+	restart \
 	shell \
 	shell-plus \
 	create-superuser \
