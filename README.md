@@ -12,4 +12,20 @@ After launch:
 
 ---
 ## Endpoints
-`/api/events` - get the paginated list of smart contract events parsed to Django database
+- `/api/events/` - get the paginated list of smart contract events parsed to Django database
+- `/message/<str:eth_address>/` - get one-time message to sign for web3/JWT authorization
+- `/auth/web3/` - get JWT refresh/access tokens using signed message
+
+---
+## Tests
+
+- testing endpoint generating one-time message to sign
+- testing signature verification
+- testing JWT authorization and accessing restricted endpoint
+
+1. Spin up the services and create env file
+```bash
+make env && make up
+```
+2. Run: `make test-api`
+
