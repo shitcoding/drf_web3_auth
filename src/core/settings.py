@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -23,6 +24,7 @@ INSTALLED_APPS = [
     'drf_web3.apps.DrfWeb3Config',
     'rest_framework',
     'django_extensions',
+    'rest_framework_simplejwt',
 ]
 
 MIDDLEWARE = [
@@ -131,7 +133,17 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': os.getenv('DJANGO_PAGINATION_PAGE_SIZE', 10)
+    'PAGE_SIZE': os.getenv('DJANGO_PAGINATION_PAGE_SIZE', 10),
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'drf_web3.authentication.Web3Authentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
+
+# Simple JWT settings
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
 
