@@ -69,6 +69,7 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL = 'drf_web3.CustomUser'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
