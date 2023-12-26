@@ -6,18 +6,19 @@ from eth_account.messages import encode_defunct
 from web3 import Web3
 from web3.middleware import geth_poa_middleware
 
+# Get env vars from .env file
 load_dotenv()
 
 headers = {}
 
+# Dummy test ETH address / private_key
 ADDRESS = '0x1232D846f11735E6A3f030a9A8E5a6c2Dd418baC'
 PK = '0xa3e6ae2f358b7ea8dde4aa613d0556d8208bf9a4c716c57eb1feb521fdb86a07'
+
 POLYGON_NODE_URL = os.getenv('POLYGON_NODE_URL')
 
-nonce_resp = requests.get(f'http://localhost:8000/api/nonce/{ADDRESS}')
-nonce = nonce_resp.json()['nonce']
-
-MESSAGE = f'I am signing my one-time nonce: {nonce}'
+message_resp = requests.get(f'http://localhost:8000/api/message/{ADDRESS}')
+MESSAGE = message_resp.json()['message_to_sign']
 print(f'{MESSAGE=}')
 
 w3 = Web3(Web3.HTTPProvider(POLYGON_NODE_URL))

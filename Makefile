@@ -38,6 +38,9 @@ migrations:
 requirements:
 	poetry export --without-hashes -o requirements.txt
 
+test:
+	$(DJANGO_EXEC) "PYTHONPATH=. pytest ./drf_web3/tests.py"
+
 
 .PHONY: \
 	env \
@@ -50,4 +53,5 @@ requirements:
 	create-test-superuser \
 	collectstatic \
 	migrations \
-	requirements
+	requirements \
+	test
