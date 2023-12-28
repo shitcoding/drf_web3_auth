@@ -13,8 +13,8 @@ After launch:
 ---
 ## Endpoints
 - `/api/events/` - get the paginated list of smart contract events parsed to Django database
-- `/message/<str:eth_address>/` - get one-time message to sign for web3/JWT authorization
-- `/auth/web3/` - get JWT refresh/access tokens using signed message
+- `/api/message/<str:eth_address>/` - get one-time message to sign for web3/JWT authorization
+- `/api/auth/web3/` - get JWT refresh/access tokens using signed message
 
 ---
 ## Tests
