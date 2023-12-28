@@ -23,7 +23,7 @@ def test_web3_auth():
     # Get the message to sign
     message_resp = requests.get(f'http://localhost:8000/api/message/{ADDRESS}')
     assert message_resp.status_code == 200
-    message = message_resp.json()['message_to_sign']
+    message = message_resp.json()['message']
 
     # Sign the message
     message_encoded = encode_defunct(text=message)
@@ -33,7 +33,11 @@ def test_web3_auth():
     signature = Web3.to_hex(signed_message['signature'])
 
     # Authenticate and get JWT token
-    json_data = {'eth_address': ADDRESS, 'signature': signature}
+    json_data = {
+        'eth_address': ADDRESS,
+        'message': message,
+        'signature': signature,
+    }
     jwt_response = requests.post(
         'http://localhost:8000/api/auth/web3/', json=json_data
     )

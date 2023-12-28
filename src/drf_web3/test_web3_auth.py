@@ -18,7 +18,7 @@ PK = '0xa3e6ae2f358b7ea8dde4aa613d0556d8208bf9a4c716c57eb1feb521fdb86a07'
 POLYGON_NODE_URL = os.getenv('POLYGON_NODE_URL')
 
 message_resp = requests.get(f'http://localhost:8000/api/message/{ADDRESS}')
-MESSAGE = message_resp.json()['message_to_sign']
+MESSAGE = message_resp.json()['message']
 print(f'{MESSAGE=}')
 
 w3 = Web3(Web3.HTTPProvider(POLYGON_NODE_URL))
@@ -33,6 +33,7 @@ print(f'\n{signature=}\n')
 
 json_data = {
     'eth_address': ADDRESS,
+    'message': MESSAGE,
     'signature': signature,
 }
 
