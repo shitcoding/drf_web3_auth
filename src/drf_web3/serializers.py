@@ -1,6 +1,10 @@
+from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator
 from rest_framework import serializers
 
-from .models import CustomUser, Event
+from .models import Event
+
+eth_address_validator = RegexValidator(regex='^0x[a-fA-F0-9]{40}$')
 
 
 class EventSerializer(serializers.ModelSerializer):
@@ -15,12 +19,27 @@ class EventSerializer(serializers.ModelSerializer):
         ]
 
 
-class EthAccountMessageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CustomUser
-        fields = ['eth_address', 'message_to_sign']
+class MessageSerializer(serializers.Serializer):
+    eth_address = serializers.CharField(
+        max_length=42, validators=[eth_address_validator]
+    )
+    message = serializers.CharField()
 
 
 class Web3AuthSerializer(serializers.Serializer):
-    eth_address = serializers.CharField(max_length=42)
-    signature = serializers.CharField(max_length=255)
+    eth_address = serializers.CharField(
+        max_length=42, validators=[eth_address_validator]
+    )
+    message = serializers.CharField()
+    signature = serializers.CharField(max_length=132)
+
+    def validate(self, data):
+        if (
+            not data.get('eth_address')
+            or not data.get('message')
+            or not data.get('signature')
+        ):
+            raise ValidationError(
+                'Ethereum address, message and signature are required.'
+            )
+        return data
